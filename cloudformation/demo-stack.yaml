@@ -27,7 +27,21 @@ Resources:
     Type: Custom::CertificateDNSRecord
     Properties:
       CertificateArn: !Ref Certificate
+      DomainName:: !Ref DomainName
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
+
+  DomainValidationRecord:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      RecordSets:
+        - Name: !Sub '${CertificateDNSRecord.Name}'
+          Type: !Sub '${CertificateDNSRecord.Type}'
+          TTL: '60'
+          Weight: 1
+          SetIdentifier: acm-domain-1
+          ResourceRecords:
+            - !Sub '${CertificateDNSRecord.Value}'
 
 Outputs:
   DNSRecord:
