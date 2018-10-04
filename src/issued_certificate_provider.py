@@ -29,15 +29,14 @@ class IssuedCertificateProvider(CertificateDNSRecordProvider):
         self.physical_resource_id = self.certificate_arn
         try:
             certificate = self.certificate
-            print(certificate)
             if certificate.status == 'ISSUED':
-                print('is issued')
+                print('{} is issued'.format(certificate))
                 self.success()
             elif certificate.status == 'PENDING_VALIDATION':
-                print('is pending validation')
+                print('{} is pending validation'.format(certificate))
                 self.async_reinvoke()
             else:
-                print('is in incorrect state {}'.format(certificate.status))
+                print('{} is in incorrect state {}'.format(certificate, certificate.status))
                 self.fail('incorrect certificated status {}, expected ISSUED or PENDING_VALIDATION'.format(
                     certificate.status))
         except PreConditionFailed as error:
