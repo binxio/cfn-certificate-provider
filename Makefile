@@ -1,6 +1,6 @@
 include Makefile.mk
 
-NAME=cfn-certificateprovider
+NAME=cfn-certificate-provider
 S3_BUCKET_PREFIX=binxio-public
 AWS_REGION=eu-central-1
 ALL_REGIONS=$(shell printf "import boto3\nprint('\\\n'.join(map(lambda r: r['RegionName'], boto3.client('ec2').describe_regions()['Regions'])))\n" | python | grep -v '^$(AWS_REGION)$$')
@@ -89,30 +89,30 @@ test: venv
 autopep:
 	autopep8 --experimental --in-place --max-line-length 132 src/*.py tests/*.py
 
-deploy-provider: COMMAND=$(shell if aws cloudformation get-template-summary --stack-name $(NAME) >/dev/null 2>&1; then \
+deploy-provider: COMMAND=$(shell if aws --region $(AWS_REGION) cloudformation get-template-summary --stack-name $(NAME) >/dev/null 2>&1; then \
 			echo update; else echo create; fi)
 deploy-provider: target/$(NAME)-$(VERSION).zip
-	aws cloudformation $(COMMAND)-stack \
+	aws --region $(AWS_REGION) cloudformation $(COMMAND)-stack \
                 --capabilities CAPABILITY_IAM \
                 --stack-name $(NAME) \
                 --template-body file://cloudformation/cfn-resource-provider.yaml \
                 --parameters \
                         ParameterKey=S3BucketPrefix,ParameterValue=$(S3_BUCKET_PREFIX) \
                         ParameterKey=CFNCustomProviderZipFileName,ParameterValue=lambdas/$(NAME)-$(VERSION).zip
-	aws cloudformation wait stack-$(COMMAND)-complete  --stack-name $(NAME)
+	aws --region $(AWS_REGION) cloudformation wait stack-$(COMMAND)-complete  --stack-name $(NAME)
 
 delete-provider:
-	aws cloudformation delete-stack --stack-name $(NAME)
-	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)
+	aws --region $(AWS_REGION) cloudformation delete-stack --stack-name $(NAME)
+	aws --region $(AWS_REGION) cloudformation wait stack-delete-complete  --stack-name $(NAME)
 
 demo:
-	COMMAND=$(shell if aws cloudformation get-template-summary --stack-name $(NAME)-demo >/dev/null 2>&1; then \
+	COMMAND=$(shell if aws --region $(AWS_REGION) cloudformation get-template-summary --stack-name $(NAME)-demo >/dev/null 2>&1; then \
 			echo update; else echo create; fi) ; \
-	aws cloudformation $$COMMAND-stack --stack-name $(NAME)-demo \
+	aws --region $(AWS_REGION) cloudformation $$COMMAND-stack --stack-name $(NAME)-demo \
 		--template-body file://cloudformation/demo-stack.yaml --capabilities CAPABILITY_NAMED_IAM;\
-	aws cloudformation wait stack-$$COMMAND-complete  --stack-name $(NAME)-demo
+	aws --region $(AWS_REGION) cloudformation wait stack-$$COMMAND-complete  --stack-name $(NAME)-demo
 
 delete-demo:
-	aws cloudformation delete-stack --stack-name $(NAME)-demo
-	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)-demo
+	aws --region $(AWS_REGION) cloudformation delete-stack --stack-name $(NAME)-demo
+	aws --region $(AWS_REGION) cloudformation wait stack-delete-complete  --stack-name $(NAME)-demo
 
