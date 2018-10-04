@@ -5,6 +5,9 @@ Parameters:
   S3BucketPrefix:
     Type: String
     Default: 'binxio-public'
+  CFNCustomProviderZipFileName:
+    Type: String
+    Default: 'lambdas/cfn-certificateprovider-0.1.0-e852181.zip'
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
@@ -17,7 +20,12 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
+              - acm:RequestCertificate
               - acm:DescribeCertificate
+              - acm:UpdateCertificateOptions
+              - acm:DeleteCertificate
+            Resource:
+            - '*'
           - Effect: Allow
             Action:
             - lambda:Invoke
@@ -45,7 +53,7 @@ Resources:
       Description: CFN Certificate Domain Resource Record Provider
       Code:
         S3Bucket: !Sub '${S3BucketPrefix}-${AWS::Region}'
-        S3Key: 'lambdas/cfn-certificate-provider-1.0.1.zip'
+        S3Key: !Ref 'CFNCustomProviderZipFileName'
       FunctionName: binxio-cfn-certificate-provider
       Handler: provider.handler
       MemorySize: 128

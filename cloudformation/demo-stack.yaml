@@ -4,26 +4,27 @@ Description: Demo Certificate DNS Record Provider
 Parameters:
   HostedZoneId:
     Type: String
+    Default: 'Z2U25GDT473TGQ'
   DomainName:
     Type: String
-    Default: 'demo.binx.io'
+    Default: 'demo.binx.cloud'
 
 Resources:
   Certificate:
-    Type: AWS::Certificate
+    Type: Custom::Certificate
     Properties:
       DomainName: !Ref DomainName
       ValidationMethod: DNS
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
 
   IssuedCertificate:
-    Type: AWS::IssuedCertificate
+    Type: Custom::IssuedCertificate
     Properties:
       CertificateArn: !Ref Certificate
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
 
   CertificateDNSRecord:
-    Type: AWS::CertificateDNSRecord
+    Type: Custom::CertificateDNSRecord
     Properties:
       CertificateArn: !Ref Certificate
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
