@@ -14,6 +14,11 @@ class Counter(object):
     def increment(self, *args, **kwargs):
         self.count += 1
 
+def test_attempt_increment():
+    issued_certificate_provider.set_request(Request('Create', 'dfsdfsdfsfdfsdfsdfs'), {})
+    assert issued_certificate_provider.attempt == 1
+    issued_certificate_provider.increment_attempt()
+    assert issued_certificate_provider.attempt == 2
 
 def test_await_pending_completion(certificate):
     counter = Counter()
@@ -35,8 +40,6 @@ def test_await_completion_issued(issued_certificate):
     response = handler(request, ())
     assert response['Status'] == 'SUCCESS', response['Reason']
     assert counter.count == 0
-
-
 
 class Request(dict):
 

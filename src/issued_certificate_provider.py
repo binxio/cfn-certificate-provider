@@ -58,13 +58,14 @@ class IssuedCertificateProvider(CertificateDNSRecordProvider):
         # exit this lambda, to avoid the framework from sending a CFN response..
         sys.exit(0)
 
+    @property
     def attempt(self):
         """ returns the number of attempts waiting for completion """
         return int(self.get('Attempt', 1))
 
     def increment_attempt(self):
         """ returns the number of attempts waiting for completion """
-        self.set('Attempt', self.attempt + 1)
+        self.properties['Attempt'] = (self.attempt + 1)
 
 
 provider = IssuedCertificateProvider()
