@@ -28,9 +28,13 @@ Resources:
             - '*'
           - Effect: Allow
             Action:
-            - lambda:Invoke
+            - lambda:InvokeFunction
             Resource:
             - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
+          - Effect: Allow
+            Action:
+              - logs:*
+            Resource: arn:aws:logs:*:*:*
       Roles:
         - !Ref 'LambdaRole'
   LambdaRole:
