@@ -27,7 +27,7 @@ Resources:
     Type: Custom::CertificateDNSRecord
     Properties:
       CertificateArn: !Ref Certificate
-      DomainName:: !Ref DomainName
+      DomainName: !Ref DomainName
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
 
   DomainValidationRecord:
