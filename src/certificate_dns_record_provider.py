@@ -110,6 +110,9 @@ class Certificate(object):
         self.domain_name = self.certificate['DomainName']
         self.options = list(map(lambda o: DomainValidationOption(o), self.certificate['DomainValidationOptions']))
 
+    def __str__(self):
+        return '{} - {}'.format(self.domain_name, self.arn)
+
     def get_validation_option(self, domain_name):
         """
         returns the validation option for `domain_name` or the certificate domain_name if not specified
