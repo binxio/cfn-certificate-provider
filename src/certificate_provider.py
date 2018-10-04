@@ -76,8 +76,9 @@ class CertificateProvider(ResourceProvider):
             self.success('nothing to change')
 
     def delete(self):
-        if self.physical_resource_id == 'failed-to-create':
+        if not self.physical_resource_id or not self.physical_resource_id.startswith('arn:aws:acm:'):
             return
+
         try:
             response = acm.delete_certificate(CertificateArn=self.physical_resource_id)
         except ClientError as error:
