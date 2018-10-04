@@ -7,7 +7,7 @@ Parameters:
     Default: 'binxio-public'
   CFNCustomProviderZipFileName:
     Type: String
-    Default: 'lambdas/cfn-certificateprovider-0.1.0-e852181.zip'
+    Default: 'lambdas/cfn-certificate-provider-0.2.0.zip'
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
