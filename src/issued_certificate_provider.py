@@ -29,11 +29,15 @@ class IssuedCertificateProvider(CertificateDNSRecordProvider):
         self.physical_resource_id = self.certificate_arn
         try:
             certificate = self.certificate
+            print(certificate)
             if certificate.status == 'ISSUED':
+                print('is issued')
                 self.success()
             elif certificate.status == 'PENDING_VALIDATION':
+                print('is pending validation')
                 self.async_reinvoke()
             else:
+                print('is in incorrect state {}'.format(certificate.status))
                 self.fail('incorrect certificated status {}, expected ISSUED or PENDING_VALIDATION'.format(
                     certificate.status))
         except PreConditionFailed as error:
@@ -48,15 +52,15 @@ class IssuedCertificateProvider(CertificateDNSRecordProvider):
     def delete(self):
         pass
 
-    def async_reinvoke(self, interval_in_seconds=15):
-        time.sleep(interval_in_seconds)
-
-        self.increment_attempt()
-        payload = json.dumps(self.request).encode('utf-8')
+    def invoke_lambda(self, payload):
         lmbda.invoke(FunctionName=self.get('ServiceToken'), InvocationType='Event', Payload=payload)
 
-        # exit this lambda, to avoid the framework from sending a CFN response..
-        sys.exit(0)
+    def async_reinvoke(self, interval_in_seconds=15):
+        self.asynchronous = True        ## do not report result to CFN yet
+        time.sleep(interval_in_seconds)
+        self.increment_attempt()
+        payload = json.dumps(self.request).encode('utf-8')
+        self.invoke_lambda(payload)
 
     @property
     def attempt(self):

@@ -22,14 +22,16 @@ def test_attempt_increment():
 
 def test_await_pending_completion(certificate):
     counter = Counter()
-    issued_certificate_provider.async_reinvoke = counter.increment
+    issued_certificate_provider.invoke_lambda = counter.increment
 
     request = Request('Create', certificate['CertificateArn'])
     response = handler(request, ())
+    assert issued_certificate_provider.asynchronous
     assert counter.count == 1
 
     request = Request('Update', certificate['CertificateArn'])
     response = handler(request, ())
+    assert issued_certificate_provider.asynchronous
     assert counter.count == 2
 
 def test_await_completion_issued(issued_certificate):
@@ -39,6 +41,7 @@ def test_await_completion_issued(issued_certificate):
     request = Request('Create', issued_certificate['CertificateArn'])
     response = handler(request, ())
     assert response['Status'] == 'SUCCESS', response['Reason']
+    assert not issued_certificate_provider.asynchronous
     assert counter.count == 0
 
 class Request(dict):
