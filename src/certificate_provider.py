@@ -33,6 +33,10 @@ class CertificateProvider(ResourceProvider):
                     "type": "string",
                     "description": "to create"
                 },
+                "SubjectAlternativeNames": {
+                    "type": "array",
+                    "description": "to create"
+                },
                 "ValidationMethod": {
                     "type": "string",
                     "enum": ["DNS"],
