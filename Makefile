@@ -116,3 +116,5 @@ delete-demo:
 	aws --region $(AWS_REGION) cloudformation delete-stack --stack-name $(NAME)-demo
 	aws --region $(AWS_REGION) cloudformation wait stack-delete-complete  --stack-name $(NAME)-demo
 
+init: ## init python
+	pipenv install --three --dev --skip-lock
