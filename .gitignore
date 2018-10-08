@@ -1,3 +1,5 @@
+.idea
+.vscode
 .pytest_cache
 .idea/workspace.xml
 .idea/tasks.xml
