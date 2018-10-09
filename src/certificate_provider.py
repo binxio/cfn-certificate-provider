@@ -28,6 +28,7 @@ class CertificateProvider(ResourceProvider):
         self.request_schema = {
             "type": "object",
             "required": ["DomainName", "ValidationMethod"],
+            "additionalProperties": True,
             "properties": {
                 "DomainName": {
                     "type": "string",
