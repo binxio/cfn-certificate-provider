@@ -35,13 +35,13 @@ Resources:
     Properties:
       HostedZoneId: !Ref HostedZoneId
       RecordSets:
-        - Name: !Sub '${CertificateDNSRecord.Name}'
-          Type: !Sub '${CertificateDNSRecord.Type}'
-          TTL: '60'
+        - Name: !GetAtt CertificateDNSRecord.Name
+          Type: !GetAtt CertificateDNSRecord.Type
+          TTL: 60
           Weight: 1
-          SetIdentifier: acm-domain-1
+          SetIdentifier: !Ref Certificate
           ResourceRecords:
-            - !Sub '${CertificateDNSRecord.Value}'
+            - !GetAtt CertificateDNSRecord.Value
 
 Outputs:
   DNSRecord:
