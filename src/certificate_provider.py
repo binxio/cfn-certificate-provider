@@ -77,8 +77,8 @@ class CertificateProvider(ResourceProvider):
                 except ClientError as error:
                     self.fail('{}'.format(error))
             elif changed_properties:
-                self.fail('You can only change the "Options" of a certificate, you tried to change {}'.format(
-                    ', '.join(changed_properties)))
+                self.fail('You can only change the "Options" and "DomainName" ' +
+                          'of a certificate, you tried to change {}'.format(', '.join(changed_properties)))
             else:
                 self.success('nothing to change')
         except ClientError as error:

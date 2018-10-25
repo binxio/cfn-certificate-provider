@@ -20,6 +20,7 @@ def certificates():
 
 def test_create(certificates):
     name = 'test-%s.binx.io' % uuid.uuid4()
+    new_name = 'test-new-%s.binx.io' % uuid.uuid4()
     alt_name = 'test-%s.binx.io' % uuid.uuid4()
 
     request = Request('Create', name)
@@ -34,12 +35,21 @@ def test_create(certificates):
     response = handler(request, ())
     assert response['Status'] == 'SUCCESS', response['Reason']
     assert response['Reason'] == 'nothing to change'
+    assert physical_resource_id == response['PhysicalResourceId']
+
+    request['OldResourceProperties'] = request['ResourceProperties'].copy()
+    request['ResourceProperties']['DomainName'] = new_name
+    response = handler(request, ())
+    assert response['Status'] == 'SUCCESS', response['Reason']
+    assert physical_resource_id != response['PhysicalResourceId']
 
     request['OldResourceProperties'] = request['ResourceProperties'].copy()
     request['ResourceProperties']['SubjectAlternativeNames'] = ['new-' + alt_name]
     response = handler(request, ())
     assert response['Status'] == 'FAILED', response['Reason']
-    assert response['Reason'].startswith('You can only change the "Options" of a certificate,'), response['Reason']
+    assert response['Reason'].startswith(
+        'You can only change the "Options" and "DomainName" of a certificate,'
+    ), response['Reason']
 
     request['ResourceProperties']['SubjectAlternativeNames'] = [alt_name]
     request['ResourceProperties']['Options'] = {'CertificateTransparencyLoggingPreference': 'DISABLED'}
@@ -65,8 +75,9 @@ class Request(dict):
             'LogicalResourceId': 'Record',
             'ResourceProperties': {
                 'DomainName': domain_name,
-                'ValidationMethod': 'DNS'
-            }})
+                'ValidationMethod': 'DNS',
+            }
+        })
 
         if physical_resource_id:
             self['PhysicalResourceId'] = physical_resource_id
