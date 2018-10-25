@@ -43,18 +43,21 @@ class CertificateProvider(ResourceProvider):
         }
 
     def create(self):
+        try:
+            self.request_certificate()
+        except ClientError as error:
+            self.fail('{}'.format(error))
+            self.physical_resource_id = 'failed-to-create'
+
+    def request_certificate(self):
         arguments = self.properties.copy()
         if 'ServiceToken' in arguments:
             del arguments['ServiceToken']
 
-        try:
-            if 'IdempotencyToken' not in arguments:
-                arguments['IdempotencyToken'] = self.request['LogicalResourceId']
-            response = acm.request_certificate(**arguments)
-            self.physical_resource_id = response['CertificateArn']
-        except ClientError as error:
-            self.fail('{}'.format(error))
-            self.physical_resource_id = 'failed-to-create'
+        if 'IdempotencyToken' not in arguments:
+            arguments['IdempotencyToken'] = self.request['LogicalResourceId']
+        response = acm.request_certificate(**arguments)
+        self.physical_resource_id = response['CertificateArn']
 
     def update(self):
         new_names = set(self.properties.keys())
@@ -65,16 +68,21 @@ class CertificateProvider(ResourceProvider):
             if self.get(name, None) != self.get_old(name, self.get(name)):
                 changed_properties.append(name)
 
-        if changed_properties and len(changed_properties) == 1 and changed_properties[0] == 'Options':
-            try:
-                acm.update_certificate_options(CertificateArn=self.physical_resource_id, Options=self.get('Options'))
-            except ClientError as error:
-                self.fail('{}'.format(error))
-        elif changed_properties:
-            self.fail('You can only change the "Options" of a certificate, you tried to change {}'.format(
-                ', '.join(changed_properties)))
-        else:
-            self.success('nothing to change')
+        try:
+            if 'DomainName' in changed_properties:
+                    return self.request_certificate()
+            elif changed_properties and len(changed_properties) == 1 and changed_properties[0] == 'Options':
+                try:
+                    acm.update_certificate_options(CertificateArn=self.physical_resource_id, Options=self.get('Options'))
+                except ClientError as error:
+                    self.fail('{}'.format(error))
+            elif changed_properties:
+                self.fail('You can only change the "Options" and "DomainName" ' +
+                          'of a certificate, you tried to change {}'.format(', '.join(changed_properties)))
+            else:
+                self.success('nothing to change')
+        except ClientError as error:
+            self.fail('{}'.format(error))
 
     def delete(self):
         if not self.physical_resource_id or not self.physical_resource_id.startswith('arn:aws:acm:'):
