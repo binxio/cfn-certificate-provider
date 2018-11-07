@@ -32,7 +32,7 @@ To install this custom resource, type:
 aws cloudformation create-stack \
 	--capabilities CAPABILITY_IAM \
 	--stack-name cfn-certificate-provider \
-	--template-body file://cloudformation/cfn-resource-provider.json 
+	--template-body file://cloudformation/cfn-resource-provider.yaml 
 
 aws cloudformation wait stack-create-complete  --stack-name cfn-certificate-provider 
 ```
@@ -47,7 +47,7 @@ To install the simple sample of the Custom Resource, type:
 read -p "domain name: " DOMAIN_NAME
 read -p "hosted zone id: " HOSTED_ZONE
 aws cloudformation create-stack --stack-name cfn-certificate-provider-demo \
-	--template-body file://cloudformation/demo-stack.json \
+	--template-body file://cloudformation/demo-stack.yaml \
 	--parameters ParameterKey=DomainName,ParameterValue=$DOMAIN_NAME \
 		     ParameterKey=HostedZoneId,ParameterValue=$HOSTED_ZONE
 aws cloudformation wait stack-create-complete  --stack-name cfn-certificate-provider-demo
