@@ -6,7 +6,6 @@ import json
 
 from certificate_dns_record_provider import CertificateDNSRecordProvider, PreConditionFailed
 
-acm = boto3.client('acm')
 lmbda = boto3.client('lambda')
 
 
