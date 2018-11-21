@@ -2,12 +2,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Custom CFN Certificate Provider with DNS validation support
 Parameters:
+  S3BucketName:
+    Type: String
+    Default: ''
   S3BucketPrefix:
     Type: String
     Default: 'binxio-public'
   CFNCustomProviderZipFileName:
     Type: String
     Default: 'lambdas/cfn-certificate-provider-0.2.1.zip'
+Conditions:
+  UseBucketName: !Not [!Equals [!Ref S3BucketName, ""]]
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
@@ -56,7 +61,7 @@ Resources:
     Properties:
       Description: CFN Certificate Domain Resource Record Provider
       Code:
-        S3Bucket: !Sub '${S3BucketPrefix}-${AWS::Region}'
+        S3Bucket: !If [UseBucketName, !Ref S3BucketName, !Sub '${S3BucketPrefix}-${AWS::Region}']
         S3Key: !Ref 'CFNCustomProviderZipFileName'
       FunctionName: binxio-cfn-certificate-provider
       Handler: provider.handler
