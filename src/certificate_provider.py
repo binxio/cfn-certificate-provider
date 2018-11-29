@@ -9,8 +9,6 @@ from cfn_resource_provider import ResourceProvider
 
 logger = logging.getLogger()
 
-acm = boto3.client('acm')
-
 
 class CertificateProvider(ResourceProvider):
     """
@@ -51,6 +49,8 @@ class CertificateProvider(ResourceProvider):
 
     def request_certificate(self):
         arguments = self.properties.copy()
+        region = arguments.pop('Region', None)
+        acm = boto3.client('acm', region_name=region)
         if 'ServiceToken' in arguments:
             del arguments['ServiceToken']
 
@@ -73,6 +73,8 @@ class CertificateProvider(ResourceProvider):
                     return self.request_certificate()
             elif changed_properties and len(changed_properties) == 1 and changed_properties[0] == 'Options':
                 try:
+                    region = self.properties.get('Region')
+                    acm = boto3.client('acm', region_name=region)
                     acm.update_certificate_options(CertificateArn=self.physical_resource_id, Options=self.get('Options'))
                 except ClientError as error:
                     self.fail('{}'.format(error))
@@ -89,6 +91,8 @@ class CertificateProvider(ResourceProvider):
             return
 
         try:
+            region = self.properties.get('Region')
+            acm = boto3.client('acm', region_name=region)
             response = acm.delete_certificate(CertificateArn=self.physical_resource_id)
         except ClientError as error:
             self.success('Ignore failure to delete certificate {}'.format(error))

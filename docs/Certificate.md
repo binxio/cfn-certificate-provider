@@ -22,6 +22,7 @@ You can specify the following properties:
     "DomainName" - to create a certificate for (required).
     "ValidationMethod" - to validate the certificate with (required to be DNS).
     "ServiceToken" - pointing to the function implementing this resource (required).
+    "Region" - region name where the certificate should be created, e.g. "us-east-1" (optional).
 
 For all other properties, check out [AWS::CertificateManager::Certificate](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-certificatemanager-certificate.html).
  
