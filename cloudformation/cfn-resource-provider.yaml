@@ -10,7 +10,7 @@ Parameters:
     Default: 'binxio-public'
   CFNCustomProviderZipFileName:
     Type: String
-    Default: 'lambdas/cfn-certificate-provider-0.2.1.zip'
+    Default: 'lambdas/cfn-certificate-provider-0.2.2.zip'
 Conditions:
   UseBucketName: !Not [!Equals [!Ref S3BucketName, ""]]
 Resources:
