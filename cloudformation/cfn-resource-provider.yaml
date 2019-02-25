@@ -1,16 +1,15 @@
----
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Custom CFN Certificate Provider with DNS validation support
 Parameters:
   S3BucketName:
     Type: String
-    Default: ''
+    Default: 'cultureamp-cfn-certificate-provider-custom-resource-lambda-code'
   S3BucketPrefix:
     Type: String
-    Default: 'binxio-public'
+    Default: ''
   CFNCustomProviderZipFileName:
     Type: String
-    Default: 'lambdas/cfn-certificate-provider-0.2.1.zip'
+    Default: 'function.zip'
 Conditions:
   UseBucketName: !Not [!Equals [!Ref S3BucketName, ""]]
 Resources:
@@ -35,7 +34,7 @@ Resources:
             Action:
             - lambda:InvokeFunction
             Resource:
-            - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
+            - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cfn-certificate-provider'
           - Effect: Allow
             Action:
               - logs:*
@@ -63,7 +62,7 @@ Resources:
       Code:
         S3Bucket: !If [UseBucketName, !Ref S3BucketName, !Sub '${S3BucketPrefix}-${AWS::Region}']
         S3Key: !Ref 'CFNCustomProviderZipFileName'
-      FunctionName: binxio-cfn-certificate-provider
+      FunctionName: cfn-certificate-provider
       Handler: provider.handler
       MemorySize: 128
       Role: !GetAtt 'LambdaRole.Arn'

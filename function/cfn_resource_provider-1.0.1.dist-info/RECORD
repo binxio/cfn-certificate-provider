@@ -1,0 +1,13 @@
+cfn_resource_provider/__init__.py,sha256=gusGZX_aeNqfwRDmVYClkMbSzcynpodSSKBw7m8N9YY,49
+cfn_resource_provider/default_injecting_validator.py,sha256=LFtBaQvdOjbCIrOBumQzF3kgVmXmtMd91W1tO5Xfy9o,1062
+cfn_resource_provider/resource_provider.py,sha256=8Mbok3776mOeoiVQA88xMulg3UvrK_OzAHb3u7za0GA,12576
+cfn_resource_provider-1.0.1.dist-info/DESCRIPTION.rst,sha256=thiZYkjSYh5GoGOTM_sbVOCmScGzmdXfxCUt16KCvow,4999
+cfn_resource_provider-1.0.1.dist-info/METADATA,sha256=e21XGV89YqVOEiNc82O2Fv-c-incazhYTeBecw-Aw68,5399
+cfn_resource_provider-1.0.1.dist-info/RECORD,,
+cfn_resource_provider-1.0.1.dist-info/WHEEL,sha256=0mO7-aKM6K9CHeURc5NDYZyLWH5lmR-r4TtPinHxz7Y,93
+cfn_resource_provider-1.0.1.dist-info/metadata.json,sha256=L30puY1c4Ykk0DxS7PKGhEEvnQDSJVuwDCXX3jiJulk,632
+cfn_resource_provider-1.0.1.dist-info/top_level.txt,sha256=Vi3XWpKTwVGqabxW5x32SecivAtfdb8-jZRNZwFqJlU,22
+cfn_resource_provider-1.0.1.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+cfn_resource_provider/__pycache__/resource_provider.cpython-36.pyc,,
+cfn_resource_provider/__pycache__/default_injecting_validator.cpython-36.pyc,,
+cfn_resource_provider/__pycache__/__init__.cpython-36.pyc,,
