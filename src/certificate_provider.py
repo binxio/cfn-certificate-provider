@@ -55,7 +55,7 @@ class CertificateProvider(ResourceProvider):
             del arguments['ServiceToken']
 
         if 'IdempotencyToken' not in arguments:
-            arguments['IdempotencyToken'] = self.request['LogicalResourceId']
+            arguments['IdempotencyToken'] = self.request['LogicalResourceId'] if len(self.request['LogicalResourceId']) <= 32 else self.request['LogicalResourceId'][:32]
         response = acm.request_certificate(**arguments)
         self.physical_resource_id = response['CertificateArn']
 
