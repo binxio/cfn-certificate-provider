@@ -60,6 +60,11 @@ def test_create(certificates):
     request['RequestType'] = 'Delete'
     response = handler(request, ())
     assert response['Status'] == 'SUCCESS', response['Reason']
+    try:
+        acm.delete_certificate(CertificateArn=physical_resource_id)
+        assert False, 'Delete operation failed for {}'.format(physical_resource_id)
+    except acm.exceptions.ResourceNotFoundException:
+        pass
 
 
 class Request(dict):
