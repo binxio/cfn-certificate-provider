@@ -2,7 +2,6 @@
 .idea/workspace.xml
 .idea/tasks.xml
 .noseids
-*.zip
 deps/
 .vscode/
 # Byte-compiled / optimized / DLL files

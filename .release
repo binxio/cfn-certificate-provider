@@ -1,3 +1,0 @@
-release=0.2.1
-tag=v0.2.1
-pre_tag_command=sed -i '' -e 's/lambdas\/cfn-.*\.zip/lambdas\/cfn-certificate-provider-@@RELEASE@@.zip/g' cloudformation/cfn-resource-provider.yaml README.md

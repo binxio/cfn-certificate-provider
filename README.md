@@ -23,7 +23,6 @@ you can fully automate the provisioning of certificates, with the following reso
 3. [Custom::IssuedCertificate](docs/IssuedCertificate.md) which will activately wait until the certificate is issued.
 4. [AWS::Route53::ResourceRecordSet](https://docs.aws.amazon.com/Route53/latest/APIReference/API_ResourceRecordSet.html) to create the validation DNS record.
 
-Checkout the sample in [cloudformation/demo-stack.yaml](cloudformation/demo-stack.yaml).
 
 ## Installation
 To install this custom resource, type:
@@ -35,21 +34,5 @@ aws cloudformation create-stack \
 	--template-body file://cloudformation/cfn-resource-provider.yaml 
 
 aws cloudformation wait stack-create-complete  --stack-name cfn-certificate-provider 
-```
-
-This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-0.2.1.zip`.
-
-
-## Demo
-To install the simple sample of the Custom Resource, type:
-
-```sh
-read -p "domain name: " DOMAIN_NAME
-read -p "hosted zone id: " HOSTED_ZONE
-aws cloudformation create-stack --stack-name cfn-certificate-provider-demo \
-	--template-body file://cloudformation/demo-stack.yaml \
-	--parameters ParameterKey=DomainName,ParameterValue=$DOMAIN_NAME \
-		     ParameterKey=HostedZoneId,ParameterValue=$HOSTED_ZONE
-aws cloudformation wait stack-create-complete  --stack-name cfn-certificate-provider-demo
 ```
 
