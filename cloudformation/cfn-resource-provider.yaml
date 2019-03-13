@@ -3,7 +3,7 @@ Description: Custom CFN Certificate Provider with DNS validation support
 Parameters:
   S3BucketName:
     Type: String
-    Default: 'cultureamp-cfn-certificate-provider-custom-resource-lambda-code'
+    Default: 'cultureamp-certificate-provider-custom-resource-stg'
   S3BucketPrefix:
     Type: String
     Default: ''

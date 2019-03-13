@@ -11,7 +11,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
     Type: Custom::IssuedCertificate
     Properties:
       CertificateArn: !Ref Certificate
-      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:cfn-certificate-provider'
 ```
 
 ## Properties
