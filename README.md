@@ -37,7 +37,7 @@ aws cloudformation create-stack \
 aws cloudformation wait stack-create-complete  --stack-name cfn-certificate-provider 
 ```
 
-This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-0.2.3.zip`.
+This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-0.2.4.zip`.
 
 
 ## Demo
