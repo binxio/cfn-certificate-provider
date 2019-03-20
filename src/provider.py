@@ -2,8 +2,9 @@ import logging
 import certificate_dns_record_provider
 import certificate_provider
 import issued_certificate_provider
+from os import getenv
 
-logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+logging.basicConfig(level=getenv("LOG_LEVEL", "INFO"))
 
 
 def handler(request, context):
