@@ -4,14 +4,12 @@ WORKDIR /lambda
 
 ADD requirements.txt /tmp
 RUN pip install --quiet -t /lambda -r /tmp/requirements.txt && \
-    rm -f /lambda/setuptools/command/launcher\ manifest.xml && \
-    rm -f /lambda/setuptools/script\ \(dev\).tmpl && \
-    find /lambda -type d | xargs chmod ugo+rx && \
-    find /lambda -type f | xargs chmod ugo+r
+    find /lambda -type d -print0 | xargs -0 chmod ugo+rx && \
+    find /lambda -type f -print0 | xargs -0 chmod ugo+r
 
 ADD src/ /lambda/
-RUN find /lambda -type d | xargs chmod ugo+rx && \
-    find /lambda -type f | xargs chmod ugo+r
+RUN find /lambda -type d -print0 | xargs -0 chmod ugo+rx && \
+    find /lambda -type f -print0 | xargs -0 chmod ugo+r
 
 RUN python -m compileall -q /lambda
 
