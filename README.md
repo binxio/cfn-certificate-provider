@@ -19,7 +19,7 @@ As a prerequisite, you need to have the hosted zones for the domain names on you
 you can fully automate the provisioning of certificates, with the following resources:
 
 1. [Custom::Certificate](docs/Certificate.md) to request a certificate without waiting for it to be issued
-3. [Custom::CertificateDNSRecord](docs/CertificateDNSRecord) which will obtain the DNS record for a domain name on the certificate.
+3. [Custom::CertificateDNSRecord](docs/CertificateDNSRecord.md) which will obtain the DNS record for a domain name on the certificate.
 3. [Custom::IssuedCertificate](docs/IssuedCertificate.md) which will activately wait until the certificate is issued.
 4. [AWS::Route53::ResourceRecordSet](https://docs.aws.amazon.com/Route53/latest/APIReference/API_ResourceRecordSet.html) to create the validation DNS record.
 
