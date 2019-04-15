@@ -19,6 +19,18 @@ def certificates():
             pass
 
 
+def test_create_wildcard(certificates):
+    name = "test-%s.binx.io" % uuid.uuid4()
+
+    request = Request("Create", f'*.{name}')
+    request["ResourceProperties"]["DomainValidationOptions"] = [
+      { 'DomainName': f'*.{name}', 'ValidationDomain': name }
+    ]
+    response = handler(request, ())
+    assert response["Status"] == "SUCCESS", response["Reason"]
+    physical_resource_id = response["PhysicalResourceId"]
+    certificates.append(physical_resource_id)
+
 def test_create(certificates):
     name = "test-%s.binx.io" % uuid.uuid4()
     new_name = "test-new-%s.binx.io" % uuid.uuid4()
