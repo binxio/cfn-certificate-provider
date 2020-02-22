@@ -29,6 +29,8 @@ Checkout the sample in [cloudformation/demo-stack.yaml](cloudformation/demo-stac
 To install this custom resource, type:
 
 ```sh
+git clone https://github.com/binxio/cfn-certificate-provider.git
+cd cfn-certificate-provider
 aws cloudformation deploy \
         --capabilities CAPABILITY_IAM \
 	--stack-name cfn-certificate-provider \
