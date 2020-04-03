@@ -35,6 +35,10 @@ class CertificateProvider(ResourceProvider):
                     "enum": ["DNS"],
                     "description": "to get the DNS validation record for",
                 },
+                "SubjectAlternativeNames": {
+                    "type": "array",
+                    "description": "Additional FQDNs to be included in the Subject Alternative Name extension of the ACM certificate.",
+                },
             },
         }
 
@@ -73,6 +77,8 @@ class CertificateProvider(ResourceProvider):
         try:
             if "DomainName" in changed_properties:
                 return self.request_certificate()
+            elif "SubjectAlternativeNames" in changed_properties:
+                return self.request_certificate()
             elif (
                 changed_properties
                 and len(changed_properties) == 1
@@ -89,7 +95,7 @@ class CertificateProvider(ResourceProvider):
                     self.fail("{}".format(error))
             elif changed_properties:
                 self.fail(
-                    'You can only change the "Options" and "DomainName" '
+                    'You can only change the "Options", "SubjectAlternativeNames" and "DomainName" '
                     + "of a certificate, you tried to change {}".format(
                         ", ".join(changed_properties)
                     )
