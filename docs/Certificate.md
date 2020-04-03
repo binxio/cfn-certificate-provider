@@ -12,6 +12,8 @@ To declare this entity in your AWS CloudFormation template, use the same syntax 
     Type: Custom::Certificate
     Properties:
       DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+      - !Join ["", ["*.", !Ref DomainName]]
       ValidationMethod: DNS
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
 ```
@@ -20,6 +22,7 @@ To declare this entity in your AWS CloudFormation template, use the same syntax 
 You can specify the following properties:
 
     "DomainName" - to create a certificate for (required).
+    "SubjectAlternativeNames" - additional FQDNs to be included in the Subject Alternative Name extension of the ACM certificate. (optional).
     "ValidationMethod" - to validate the certificate with (required to be DNS).
     "ServiceToken" - pointing to the function implementing this resource (required).
     "Region" - region name where the certificate should be created, e.g. "us-east-1" (optional).
