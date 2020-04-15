@@ -106,3 +106,5 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+packaged_template.json
