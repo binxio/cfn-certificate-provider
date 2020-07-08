@@ -19,6 +19,8 @@ Resources:
 
   IssuedCertificate:
     Type: Custom::IssuedCertificate
+    DependsOn:
+      - DomainValidationRecord
     Properties:
       CertificateArn: !Ref Certificate
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
