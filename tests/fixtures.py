@@ -7,8 +7,8 @@ acm = boto3.client("acm")
 
 @pytest.fixture(scope="module")
 def certificate():
-    name = "test-%s.binx.io" % uuid.uuid4()
-    alt_name = "test-%s.binx.io" % uuid.uuid4()
+    name = "test-%s.mark.binx.dev" % uuid.uuid4()
+    alt_name = "test-%s.mark.binx.dev" % uuid.uuid4()
     certificate = acm.request_certificate(
         DomainName=name, ValidationMethod="DNS", SubjectAlternativeNames=[alt_name]
     )
@@ -37,8 +37,8 @@ def issued_certificate():
 
 @pytest.fixture(scope="module")
 def email_certificate():
-    name = "test-%s.binx.io" % uuid.uuid4()
-    alt_name = "test-%s.binx.io" % uuid.uuid4()
+    name = "test-%s.mark.binx.dev" % uuid.uuid4()
+    alt_name = "test-%s.mark.binx.dev" % uuid.uuid4()
     certificate = acm.request_certificate(
         DomainName=name, ValidationMethod="EMAIL", SubjectAlternativeNames=[alt_name]
     )

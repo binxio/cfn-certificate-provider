@@ -20,7 +20,7 @@ def certificates():
 
 
 def test_create_wildcard(certificates):
-    name = "test-%s.binx.io" % uuid.uuid4()
+    name = "test-%s.mark.binx.dev" % uuid.uuid4()
 
     request = Request("Create", f'*.{name}')
     request["ResourceProperties"]["DomainValidationOptions"] = [
@@ -32,9 +32,9 @@ def test_create_wildcard(certificates):
     certificates.append(physical_resource_id)
 
 def test_create(certificates):
-    name = "test-%s.binx.io" % uuid.uuid4()
-    new_name = "test-new-%s.binx.io" % uuid.uuid4()
-    alt_name = "test-%s.binx.io" % uuid.uuid4()
+    name = "test-%s.mark.binx.dev" % uuid.uuid4()
+    new_name = "test-new-%s.mark.binx.dev" % uuid.uuid4()
+    alt_name = "test-%s.mark.binx.dev" % uuid.uuid4()
 
     request = Request("Create", name)
     request["ResourceProperties"]["SubjectAlternativeNames"] = [alt_name]
@@ -59,12 +59,12 @@ def test_create(certificates):
     request["OldResourceProperties"] = request["ResourceProperties"].copy()
     request["ResourceProperties"]["SubjectAlternativeNames"] = ["new-" + alt_name]
     response = handler(request, ())
-    assert response["Status"] == "FAILED", response["Reason"]
-    assert response["Reason"].startswith(
-        'You can only change the "Options" and "DomainName" of a certificate,'
-    ), response["Reason"]
+    assert response["Status"] == "SUCCESS", response["Reason"]
+    assert physical_resource_id != response["PhysicalResourceId"], "a new certificate should have been created"
+    physical_resource_id = response["PhysicalResourceId"]
 
-    request["ResourceProperties"]["SubjectAlternativeNames"] = [alt_name]
+    request["OldResourceProperties"] = request["ResourceProperties"].copy()
+    request["PhysicalResourceId"] = response["PhysicalResourceId"]
     request["ResourceProperties"]["Options"] = {
         "CertificateTransparencyLoggingPreference": "DISABLED"
     }

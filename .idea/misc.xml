@@ -3,5 +3,5 @@
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_10" default="false" project-jdk-name="Python 3.7 (cfn-certificate-provider)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_10" default="false" project-jdk-name="Pipenv (cfn-certificate-provider)" project-jdk-type="Python SDK" />
 </project>
