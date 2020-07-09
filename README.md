@@ -37,7 +37,7 @@ aws cloudformation deploy \
 	--template-file cloudformation/cfn-resource-provider.yaml
 ```
 
-This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-0.2.4.zip`.
+This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-0.2.5.zip`.
 
 
 ## Demo
