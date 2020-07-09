@@ -116,3 +116,15 @@ delete-demo:
 	aws --region $(AWS_REGION) cloudformation delete-stack --stack-name $(NAME)-demo
 	aws --region $(AWS_REGION) cloudformation wait stack-delete-complete  --stack-name $(NAME)-demo
 
+deploy-pipeline: 
+	aws cloudformation deploy \
+                --capabilities CAPABILITY_IAM \
+                --stack-name $(NAME)-pipeline \
+                --template-file ./cloudformation/cicd-pipeline.yaml \
+                --parameter-overrides \
+                        S3BucketPrefix=$(S3_BUCKET_PREFIX)
+
+delete-pipeline: 
+	aws cloudformation delete-stack --stack-name $(NAME)-pipeline
+	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)-pipeline
+
