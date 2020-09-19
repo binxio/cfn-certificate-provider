@@ -1,3 +1,10 @@
+# Deprecation notice 
+Almost two years after the release of this custom provider,  AWS finally provides native support for 
+creating certificates with CloudFormation without manual intervention. Checkout 
+https://aws.amazon.com/blogs/security/how-to-use-aws-certificate-manager-with-aws-cloudformation/
+
+So, it is highly likely you do not need  this  custom provider anymore.
+
 # Custom Certificate Provider with DNS validation support
 AWS Certificate Manager is a great service that allows the creation and renewal of certificates
 to be automated. It provides two ways of validating a certificate request: through email and through DNS.
@@ -6,7 +13,7 @@ When you are creating immutable infrastructure, the email validation method is a
 human intervention. The DNS validation is of course the way to go! With 'Route53' we have full
 control over the DNS domain and can create the required records.
 
-Although the CloudFormation [AWS::CertificateManager::Certificate](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-certificatemanager-certificate.html) resource allow you to specify that you want DNS validation, it does not 
+Although the CloudFormation [AWS::CertificateManager::Certificate](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-certificatemanager-certificate.html) resource allow you to specify that you want DNS validation, it did not 
 reveal the DNS records that you need to create. It writes them in the CloudFormation log
 file so that another human has to collect them and manually update the DNS record.
 
