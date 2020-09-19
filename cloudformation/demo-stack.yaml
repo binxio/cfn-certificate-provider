@@ -4,16 +4,18 @@ Description: Demo Certificate DNS Record Provider
 Parameters:
   HostedZoneId:
     Type: String
-    Default: 'Z2U25GDT473TGQ'
+    Default: 'Z0371259XDZLRTIQJZIY'
   DomainName:
     Type: String
-    Default: 'demo.binx.cloud'
+    Default: 'mark.binx.dev'
 
 Resources:
   Certificate:
     Type: Custom::Certificate
     Properties:
       DomainName: !Ref DomainName
+      SubjectAlternativeNames:
+        - !Sub '*.${DomainName}'
       ValidationMethod: DNS
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
 
@@ -25,11 +27,18 @@ Resources:
       CertificateArn: !Ref Certificate
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
 
-  CertificateDNSRecord:
+  DomainNameValidationDNSRecord:
     Type: Custom::CertificateDNSRecord
     Properties:
       CertificateArn: !Ref Certificate
       DomainName: !Ref DomainName
+      ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
+
+  AlternativeDomainNameValidationDNSRecord:
+    Type: Custom::CertificateDNSRecord
+    Properties:
+      CertificateArn: !Ref Certificate
+      DomainName: !Sub '*.${DomainName}'
       ServiceToken: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
 
   DomainValidationRecord:
@@ -37,14 +46,22 @@ Resources:
     Properties:
       HostedZoneId: !Ref HostedZoneId
       RecordSets:
-        - Name: !GetAtt CertificateDNSRecord.Name
-          Type: !GetAtt CertificateDNSRecord.Type
+        - Name: !GetAtt DomainNameValidationDNSRecord.Name
+          Type: !GetAtt DomainNameValidationDNSRecord.Type
           TTL: 60
           Weight: 1
           SetIdentifier: !Ref Certificate
           ResourceRecords:
-            - !GetAtt CertificateDNSRecord.Value
+            - !GetAtt DomainNameValidationDNSRecord.Value
+
+        - Name: !GetAtt AlternativeDomainNameValidationDNSRecord.Name
+          Type: !GetAtt AlternativeDomainNameValidationDNSRecord.Type
+          TTL: 60
+          Weight: 1
+          SetIdentifier: !Ref Certificate
+          ResourceRecords:
+            - !GetAtt AlternativeDomainNameValidationDNSRecord.Value
 
 Outputs:
-  DNSRecord:
-    Value: !Sub '${CertificateDNSRecord.Name} ${CertificateDNSRecord.Type} ${CertificateDNSRecord.Value}'
+  DomainNameValidationDNSRecord:
+    Value: !Sub '${DomainNameValidationDNSRecord.Name} ${DomainNameValidationDNSRecord.Type} ${DomainNameValidationDNSRecord.Value}'
