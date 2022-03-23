@@ -36,6 +36,12 @@ aws cloudformation create-stack \
     --stack-name cfn-certificate-provider \
     --parameters \
     "ParameterKey=S3BucketName,ParameterValue=cultureamp-certificate-provider-custom-resource-<account>" \
+    --tags \
+        "Key=asset,Value=cfn-certificate-provider" \
+        "Key=camp,Value=<camp-owning-account>" \
+        "Key=data-classification,Value=none" \
+        "Key=team,Value=sre" \
+        "Key=workload,Value=management" \
     --template-body file://cloudformation/cfn-resource-provider.yaml
 
 aws cloudformation wait stack-create-complete  --stack-name cfn-certificate-provider
