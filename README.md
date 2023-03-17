@@ -1,9 +1,10 @@
-# Deprecation notice
+# CloudFormation custom Certificate provider
 Almost two years after the release of this custom provider,  AWS finally provides native support for
 creating certificates with CloudFormation without manual intervention. Checkout
 https://aws.amazon.com/blogs/security/how-to-use-aws-certificate-manager-with-aws-cloudformation/
 
-So, it is highly likely you do not need  this  custom provider anymore.
+So, it is highly likely you do not need this custom provider anymore. If you want to create
+certificates in different regions, this provider is still pretty useful.
 
 # Custom Certificate Provider with DNS validation support
 AWS Certificate Manager is a great service that allows the creation and renewal of certificates
@@ -44,7 +45,7 @@ aws cloudformation deploy \
 	--template-file cloudformation/cfn-resource-provider.yaml
 ```
 
-This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-0.2.5.zip`.
+This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-1.0.0.zip`.
 
 
 ## Demo
