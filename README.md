@@ -1,6 +1,6 @@
-# Deprecation notice 
-Almost two years after the release of this custom provider,  AWS finally provides native support for 
-creating certificates with CloudFormation without manual intervention. Checkout 
+# Deprecation notice
+Almost two years after the release of this custom provider,  AWS finally provides native support for
+creating certificates with CloudFormation without manual intervention. Checkout
 https://aws.amazon.com/blogs/security/how-to-use-aws-certificate-manager-with-aws-cloudformation/
 
 So, it is highly likely you do not need  this  custom provider anymore.
@@ -13,7 +13,7 @@ When you are creating immutable infrastructure, the email validation method is a
 human intervention. The DNS validation is of course the way to go! With 'Route53' we have full
 control over the DNS domain and can create the required records.
 
-Although the CloudFormation [AWS::CertificateManager::Certificate](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-certificatemanager-certificate.html) resource allow you to specify that you want DNS validation, it did not 
+Although the CloudFormation [AWS::CertificateManager::Certificate](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-certificatemanager-certificate.html) resource allow you to specify that you want DNS validation, it did not
 reveal the DNS records that you need to create. It writes them in the CloudFormation log
 file so that another human has to collect them and manually update the DNS record.
 
@@ -27,7 +27,7 @@ you can fully automate the provisioning of certificates, with the following reso
 
 1. [Custom::Certificate](docs/Certificate.md) to request a certificate without waiting for it to be issued
 3. [Custom::CertificateDNSRecord](docs/CertificateDNSRecord.md) which will obtain the DNS record for a domain name on the certificate.
-3. [Custom::IssuedCertificate](docs/IssuedCertificate.md) which will activately wait until the certificate is issued.
+3. [Custom::IssuedCertificate](docs/IssuedCertificate.md) which will actively wait until the certificate is issued.
 4. [AWS::Route53::ResourceRecordSet](https://docs.aws.amazon.com/Route53/latest/APIReference/API_ResourceRecordSet.html) to create the validation DNS record.
 
 Checkout the sample in [cloudformation/demo-stack.yaml](cloudformation/demo-stack.yaml).
