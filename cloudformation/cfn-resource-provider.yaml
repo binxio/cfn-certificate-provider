@@ -5,43 +5,42 @@ Parameters:
   S3BucketName:
     Type: String
     Default: ''
+
   S3BucketPrefix:
     Type: String
     Default: 'binxio-public'
+
   CFNCustomProviderZipFileName:
     Type: String
     Default: 'lambdas/cfn-certificate-provider-0.2.5.zip'
+
 Conditions:
   UseBucketName: !Not [!Equals [!Ref S3BucketName, ""]]
+
 Resources:
   LambdaPolicy:
     Type: AWS::IAM::Policy
-    DependsOn:
-      - LambdaRole
     Properties:
       PolicyName: CFNCertificateDomainResourceRecordProvider
+      Roles:
+        - !Ref 'LambdaRole'
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Action:
               - acm:RequestCertificate
+            Resource: '*'
+          - Effect: Allow
+            Action:
               - acm:DescribeCertificate
               - acm:UpdateCertificateOptions
               - acm:DeleteCertificate
-            Resource:
-            - '*'
+            Resource: !Sub arn:aws:acm:*:${AWS::AccountId}:certificate/*
           - Effect: Allow
-            Action:
-            - lambda:InvokeFunction
-            Resource:
-            - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
-          - Effect: Allow
-            Action:
-              - logs:*
-            Resource: arn:aws:logs:*:*:*
-      Roles:
-        - !Ref 'LambdaRole'
+            Action: lambda:InvokeFunction
+            Resource: !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:binxio-cfn-certificate-provider'
+
   LambdaRole:
     Type: AWS::IAM::Role
     Properties:
@@ -54,17 +53,25 @@ Resources:
             Principal:
               Service:
                 - lambda.amazonaws.com
+      Policies:
+        - PolicyName: CloudWatchLogs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/binxio-cfn-certificate-provider:*
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+
   CFNCustomProviderLogGroup:
     Type: AWS::Logs::LogGroup
-    DependsOn:
-      - CFNCustomProvider
     Properties:
       LogGroupName: !Sub /aws/lambda/${CFNCustomProvider}
       RetentionInDays: 7
+
   CFNCustomProvider:
     Type: AWS::Lambda::Function
-    DependsOn:
-      - LambdaRole
     Properties:
       Description: CFN Certificate Domain Resource Record Provider
       Code:
@@ -74,5 +81,5 @@ Resources:
       Handler: provider.handler
       MemorySize: 128
       Role: !GetAtt 'LambdaRole.Arn'
-      Runtime: python3.6
+      Runtime: python3.9
       Timeout: 300
