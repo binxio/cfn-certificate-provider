@@ -75,6 +75,8 @@ class CertificateDNSRecordProvider(ResourceProvider):
         return result
 
     def poll_for_resource_record(self):
+        # Sleep for 5 seconds because describe_certificate gives a different answer after 3 seconds.
+        time.sleep(5)
         try:
             dns_record = None
             while not dns_record:
