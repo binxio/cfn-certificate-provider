@@ -42,7 +42,7 @@ cd cfn-certificate-provider
 aws cloudformation deploy \
         --capabilities CAPABILITY_IAM \
 	--stack-name cfn-certificate-provider \
-	--template-file cloudformation/cfn-resource-provider.yaml
+	--template-file cloudformation/cfn-certificate-provider.yaml
 ```
 
 This CloudFormation template will use our pre-packaged provider from `s3://binxio-public-${AWS_REGION}/lambdas/cfn-certificate-provider-1.0.2.zip`.
