@@ -12,7 +12,7 @@ Parameters:
 
   CFNCustomProviderZipFileName:
     Type: String
-    Default: 'lambdas/cfn-certificate-provider-1.0.3.zip'
+    Default: 'lambdas/cfn-certificate-provider-1.0.4.zip'
 
 Conditions:
   UseBucketName: !Not [!Equals [!Ref S3BucketName, ""]]
