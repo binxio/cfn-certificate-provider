@@ -45,7 +45,7 @@ aws cloudformation deploy \
 	--template-file cloudformation/cfn-certificate-provider.yaml
 ```
 
-This CloudFormation template will use our pre-packaged provider from `463637877380.dkr.ecr.eu-central-1.amazonaws.com/xebia/cfn-certificate-provider:0.0.0`.
+This CloudFormation template will use our pre-packaged provider from `463637877380.dkr.ecr.eu-central-1.amazonaws.com/xebia/cfn-certificate-provider:2.0.0`.
 
 
 ## Demo

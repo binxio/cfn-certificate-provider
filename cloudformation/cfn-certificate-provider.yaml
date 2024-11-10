@@ -60,7 +60,7 @@ Resources:
       Description: CFN Certificate Domain Resource Record Provider
       PackageType: Image
       Code:
-        ImageUri: 463637877380.dkr.ecr.eu-central-1.amazonaws.com/xebia/cfn-certificate-provider:1.0.4-f39b907-dirty
+        ImageUri: 463637877380.dkr.ecr.eu-central-1.amazonaws.com/xebia/cfn-certificate-provider:2.0.0
       FunctionName: binxio-cfn-certificate-provider
       MemorySize: 128
       Role: !GetAtt 'LambdaRole.Arn'
