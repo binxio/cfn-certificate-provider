@@ -1,115 +1,128 @@
-S3_BUCKET=$(S3_BUCKET_PREFIX)-$(AWS_REGION)
-S3_OBJECT_ACL=private
-ALL_REGIONS=$(shell aws --region $(AWS_REGION) \
-		ec2 describe-regions 		\
-		--query 'join(`\n`, Regions[?RegionName != `$(AWS_REGION)`].RegionName)' \
-		--output text)
+#
+#   Copyright 2015-2024  Xebia Nederland B.V.
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+REGISTRY_HOST=docker.io
+USERNAME=$(USER)
+NAME=$(shell basename $(CURDIR))
 
-VERSION := $(shell git describe  --tags --dirty)
+RELEASE_SUPPORT := $(shell dirname $(abspath $(lastword $(MAKEFILE_LIST))))/.make-release-support
+IMAGE=$(REGISTRY_HOST)/$(USERNAME)/$(NAME)
 
-build: target/$(NAME)-$(VERSION).zip		## build the lambda zip file
 
-fmt:	## formats the source code
-	black src/ tests/
+VERSION=$(shell . $(RELEASE_SUPPORT) ; getVersion)
+BASE_RELEASE=$(shell . $(RELEASE_SUPPORT) ; getRelease)
 
-test:	## run python unit tests
-	pipenv run tox
+TAG=$(shell . $(RELEASE_SUPPORT); getTag)
+TAG_WITH_LATEST=always
 
-test-record: ## run python unit tests, while recording the boto3 calls
-	RECORD_UNITTEST_STUBS=true pipenv run tox
+SHELL=/bin/bash
 
-test-templates:     ## validate CloudFormation templates
-	for n in ./cloudformation/*.yaml ; do aws cloudformation validate-template --template-body file://$$n ; done
+DOCKER_BUILD_CONTEXT=.
+DOCKER_FILE_PATH=Dockerfile
 
-deploy: target/$(NAME)-$(VERSION).zip@$(S3_BUCKET_PREFIX)	## AWS lambda zipfile to bucket
+.PHONY: pre-build docker-build post-build build release patch-release minor-release major-release tag check-status check-release showver \
+	push pre-push do-push post-push showimage
 
-target/$(NAME)-$(VERSION).zip: src/ requirements.txt
-	mkdir -p target/content
-	docker build --build-arg ZIPFILE=$(NAME)-$(VERSION).zip -t $(NAME)-lambda:$(VERSION) -f Dockerfile.lambda . && \
-		ID=$$(docker create $(NAME)-lambda:$(VERSION) /bin/true) && \
-		docker export $$ID | (cd target && tar -xvf - $(NAME)-$(VERSION).zip) && \
-		docker rm -f $$ID && \
-		chmod ugo+r target/$(NAME)-$(VERSION).zip
+build: pre-build docker-build post-build	## builds a new version of your container image
 
-target/$(NAME)-$(VERSION).zip@$(S3_BUCKET_PREFIX): target/$(NAME)-$(VERSION).zip
-	aws s3 --region $(AWS_REGION) \
-		cp --acl $(S3_OBJECT_ACL) \
-		cloudformation/$(NAME).yaml \
-		s3://$(S3_BUCKET)/lambdas/$(NAME)-$(VERSION).yaml
-	aws s3 --region $(AWS_REGION) \
-		cp --acl $(S3_OBJECT_ACL) \
-		target/$(NAME)-$(VERSION).zip \
-		s3://$(S3_BUCKET)/lambdas/$(NAME)-$(VERSION).zip
-	touch target/$(NAME)-$(VERSION).zip@$(S3_BUCKET_PREFIX)
+pre-build:
 
-deploy-all-regions: target/$(NAME)-$(VERSION).zip@$(S3_BUCKET_PREFIX)	## AWS lambda zipfiles to all regional buckets
-	@for REGION in $(ALL_REGIONS); do \
-		echo "copying to region $$REGION.." ; \
-		aws s3 --region $$REGION \
-			cp  --acl $(S3_OBJECT_ACL) \
-			s3://$(S3_BUCKET)/lambdas/$(NAME)-$(VERSION).zip \
-			s3://$(S3_BUCKET_PREFIX)-$$REGION/lambdas/$(NAME)-$(VERSION).zip; \
-	done
 
-undeploy-all-regions:	## deletes AWS lambda zipfile of this release from all buckets in all regions
-	@for REGION in $(ALL_REGIONS); do \
-                echo "removing lamdba from region $$REGION.." ; \
-                aws s3 --region $(AWS_REGION) \
-                        rm  \
-                        s3://$(S3_BUCKET_PREFIX)-$$REGION/lambdas/$(NAME)-$(VERSION).zip; \
-        done
-	rm -f target/$(NAME)-$(VERSION).zip@$(S3_BUCKET_PREFIX)
+post-build:
 
-Pipfile.lock: Pipfile setup.cfg pyproject.toml
-	pipenv update
 
-deploy-provider: target/$(NAME)-$(VERSION).zip@$(S3_BUCKET_PREFIX)  ## deploys the custom provider
-	sed -i -e 's^lambdas/$(NAME)-[0-9]*\.[0-9]*\.[0-9]*[^\.]*\.'^lambdas/$(NAME)-$(VERSION).^g cloudformation/$(NAME).yaml
-	aws cloudformation deploy \
-                --capabilities CAPABILITY_IAM \
-                --stack-name $(NAME) \
-                --template-file ./cloudformation/$(NAME).yaml \
-                --parameter-overrides S3BucketPrefix=$(S3_BUCKET_PREFIX) \
-				--no-fail-on-empty-changeset
+pre-push:
 
-delete-provider: ## deletes the custom provider
-	aws cloudformation delete-stack --stack-name $(NAME)
-	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)
 
-deploy-pipeline:  ## deploys the CI/CD deployment pipeline
-	aws cloudformation deploy \
-                --capabilities CAPABILITY_IAM \
-                --stack-name $(NAME)-pipeline \
-                --template-file ./cloudformation/cicd-pipeline.yaml \
-                --parameter-overrides S3BucketPrefix=$(S3_BUCKET_PREFIX) \
-				--no-fail-on-empty-changeset
+post-push:
 
-delete-pipeline:  ## deletes the CI/CD deployment pipeline
-	aws cloudformation delete-stack --stack-name $(NAME)-pipeline
-	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)-pipeline
 
-deploy-demo:	## deploys the demo stack
-	aws cloudformation deploy --stack-name $(NAME)-demo \
-		--template-file ./cloudformation/demo.yaml \
-		--capabilities CAPABILITY_NAMED_IAM \
-		--no-fail-on-empty-changeset
+docker-build: .release
+	docker build $(DOCKER_BUILD_ARGS) -t $(IMAGE):$(VERSION) $(DOCKER_BUILD_CONTEXT) -f $(DOCKER_FILE_PATH)
+	@if [[ $(TAG_WITH_LATEST) != never ]] && ([[ $(TAG_WITH_LATEST) == always ]] || [[ $(BASE_RELEASE) == $(VERSION) ]]); then \
+		echo docker tag $(IMAGE):$(VERSION) $(IMAGE):latest >&2; \
+		docker tag $(IMAGE):$(VERSION) $(IMAGE):latest; \
+	else \
+		echo docker rmi --force --no-prune $(IMAGE):latest >&2; \
+		docker rmi --force --no-prune $(IMAGE):latest 2>/dev/null; \
+	fi
 
-delete-demo: ## deletes the demo stack
-	aws cloudformation delete-stack --stack-name $(NAME)-demo
-	aws cloudformation wait stack-delete-complete  --stack-name $(NAME)-demo
+.release:
+	@echo "release=0.0.0" > .release
+	@echo "tag=$(NAME)-0.0.0" >> .release
+	@echo "tag_on_changes_in=." >> .release
+	@echo INFO: .release created
+	@cat .release
 
-tag-patch-release: ## create a tag for a new patch release
-	pipenv run git-release-tag bump --level patch
 
-tag-minor-release: ## create a tag for a new minor release
-	pipenv run git-release-tag bump --level minor
+release: check-status check-release build push
 
-tag-major-release: ## create a tag for new major release
-	pipenv run git-release-tag bump --level major
 
-show-version: ## shows the current version of the workspace
-	pipenv run git-release-tag show .
+push: pre-push do-push post-push
 
-help:           ## Show this help.
-		@egrep -h ':[^#]*##' $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/:[^#]*##/: ##/' -e 's/[ 	]*##[ 	]*/ /' | \
-		awk -F: '{printf "%-20s -", $$1; $$1=""; print $$0}'
+do-push: IMAGE_EXISTS=$(shell docker manifest inspect $(IMAGE):$(VERSION) 2>/dev/null)
+do-push:
+	docker push $(IMAGE):$(VERSION)
+	@if [[ $(TAG_WITH_LATEST) != never ]] && ([[ $(TAG_WITH_LATEST) == always ]] || [[ $(BASE_RELEASE) == $(VERSION) ]]); then \
+		echo docker push $(IMAGE):latest >&2; \
+		docker push $(IMAGE):latest; \
+	fi
+
+snapshot: build push				## builds a new version of your container image, and pushes it to the registry
+
+showver: .release				## shows the current release tag based on the workspace
+	@. $(RELEASE_SUPPORT); getVersion
+
+showimage: .release				## shows the container image name based on the workspace
+	@echo $(IMAGE):$(VERSION)
+
+tag-patch-release: VERSION := $(shell . $(RELEASE_SUPPORT); nextPatchLevel)
+tag-patch-release: .release tag 		## increments the patch release level and create the tag without build
+
+tag-minor-release: VERSION := $(shell . $(RELEASE_SUPPORT); nextMinorLevel)
+tag-minor-release: .release tag 		## increments the minor release level and create the tag without build
+
+tag-major-release: VERSION := $(shell . $(RELEASE_SUPPORT); nextMajorLevel)
+tag-major-release: .release tag 		## increments the major release level and create the tag without build
+
+patch-release: tag-patch-release release	## increments the patch release level, build and push to registry
+	@echo $(VERSION)
+
+minor-release: tag-minor-release release	## increments the minor release level, build and push to registry
+	@echo $(VERSION)
+
+major-release: tag-major-release release	## increments the major release level, build and push to registry
+	@echo $(VERSION)
+
+
+tag: TAG=$(shell . $(RELEASE_SUPPORT); getTag $(VERSION))
+tag: check-status
+	@. $(RELEASE_SUPPORT) ; ! tagExists $(TAG) || (echo "ERROR: tag $(TAG) for version $(VERSION) already tagged in git" >&2 && exit 1) ;
+	@. $(RELEASE_SUPPORT) ; setRelease $(VERSION)
+	git add .
+	git commit -m "bumped to version $(VERSION)" ;
+	git tag $(TAG) ;
+	@ if [ -n "$(shell git remote -v)" ] ; then git push --tags ; else echo 'no remote to push tags to' ; fi
+
+check-status:			## checks whether there are outstanding changes
+	@. $(RELEASE_SUPPORT) ; ! hasChanges || (echo "ERROR: there are still outstanding changes" >&2 && showChanges >&2 && exit 1) ;
+
+check-release: .release		## checks whether the workspace matches the tagged release in git
+	@. $(RELEASE_SUPPORT) ; tagExists $(TAG) || (echo "ERROR: version not yet tagged in git. make [minor,major,patch]-release." >&2 && exit 1) ;
+	@. $(RELEASE_SUPPORT) ; ! differsFromRelease $(TAG) || (echo "ERROR: current directory differs from tagged $(TAG). make [minor,major,patch]-release." && showDiffFromRelease >&2 ; exit 1)
+
+
+help:           ## show this help.
+	@fgrep -h "##" $(MAKEFILE_LIST) | grep -v fgrep | sed -e 's/\([^:]*\):[^#]*##\(.*\)/printf '"'%-20s - %s\\\\n' '\1' '\2'"'/' |bash
