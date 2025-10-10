@@ -106,3 +106,7 @@ ENV/
 
 # mypy
 .mypy_cache/
+#
+Pipfile.lock
+requirements.txt
+test-requirements.txt

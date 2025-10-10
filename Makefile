@@ -8,6 +8,7 @@ AWS_ACCOUNT=$(shell aws sts get-caller-identity --query Account --output text)
 REGISTRY_HOST=$(AWS_ACCOUNT).dkr.ecr.$(AWS_REGION).amazonaws.com
 IMAGE=$(REGISTRY_HOST)/$(USERNAME)/$(NAME)
 TAG_WITH_LATEST=never
+DOCKER_BUILD_ARGS=--platform=linux/amd64
 
 
 requirements.txt test-requirements.txt: Pipfile.lock
